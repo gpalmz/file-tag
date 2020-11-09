@@ -1,6 +1,6 @@
 import operator
 
-from sexpdata import loads, Symbol
+from sexpdata import loads as str_to_sexpr, Symbol
 
 from util import find, apply_pred
 from predicate import p_not as create_not, p_all as create_and, p_any as create_or
@@ -63,10 +63,6 @@ def parse_sexpr(sexpr):
         return create_lt(parse_sexpr_func_args(sexpr))
     elif is_sexpr_func(sexpr, '>'):
         return create_gt(parse_sexpr_func_args(sexpr))
-
-
-def str_to_sexpr(s):
-    return loads(s)
 
 
 def parse_str(s):

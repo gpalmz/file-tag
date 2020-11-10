@@ -2,38 +2,32 @@ import operator
 
 from sexpdata import loads as str_to_sexpr, Symbol
 
-from util import find, apply_pred
+from util import have_matching_combination
 from predicate import p_not as create_not, p_all as create_and, p_any as create_or
-
-KEY_NOT_FOUND = object()
 
 
 def create_atom(val):
-    return lambda tags: val
+    return lambda tags: [val]
 
 
-def create_key(key_val):
-    def eval_key(tags):
-        tag = find(lambda tag: tag.key == key_val(tags), tags)
-        return KEY_NOT_FOUND if tag is None else tag.value
-
-    return eval_key
+def create_key(key_atom):
+    return lambda tags: [tag.value for tag in tags if tag.key in key_atom(tags)]
 
 
 def create_has(keys):
-    return lambda tags: all(key(tags) is not KEY_NOT_FOUND for key in keys)
+    return lambda tags: all(key(tags) for key in keys)
 
 
 def create_eq(args):
-    return lambda tags: apply_pred(operator.eq, (arg(tags) for arg in args))
+    return lambda tags: have_matching_combination(operator.eq, (arg(tags) for arg in args))
 
 
-def create_lt(args):
-    return lambda tags: apply_pred(operator.lt, (arg(tags) for arg in args))
+def create_lt(args):  
+    return lambda tags: have_matching_combination(operator.lt, (arg(tags) for arg in args))
 
 
 def create_gt(args):
-    return lambda tags: apply_pred(operator.gt, (arg(tags) for arg in args))
+    return lambda tags: have_matching_combination(operator.gt, (arg(tags) for arg in args))
 
 
 def is_sexpr_func(sexpr, name):
